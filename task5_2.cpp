@@ -6,14 +6,17 @@
 #include <functional>
 #include <typeinfo>
 
+static std::stringstream m_stream;
+
 
 struct Printer
 {
-    std::stringstream m_stream;
 
     std::string str() const 
     {
-        return m_stream.str();
+        std::string s = std::move(m_stream.str());
+        m_stream.str("");
+        return s;
     }
 
     template<typename T>
@@ -94,7 +97,7 @@ std::string format(const T& t) {
 }
 
 
-int main() 
+int main()
 {
     std::tuple<std::string, int, int> t = {"xyz", 1, 2};
     std::vector<std::pair<int, int> > v = {{1, 4}, {5, 6}};
@@ -116,8 +119,11 @@ int main()
                                                     {"qax", "ert", "33"}, 
                                                     {"12345", 99}};
 
+    std::pair<std::string, double> t3 = {"qwe", 2.5};
     std::string s3 = Printer().format(v2).format(" vector:::: ").format(t2).format(2).str();
     std::cout << s3 << std::endl;
+    std::cout << std::endl;
+    std::cout << format(t3) << std::endl;
     return 0;
 }
 
