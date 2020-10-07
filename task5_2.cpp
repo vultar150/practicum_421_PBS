@@ -3,8 +3,7 @@
 #include <vector>
 #include <set>
 #include <tuple>
-#include <functional>
-#include <typeinfo>
+
 
 static std::stringstream m_stream;
 
@@ -12,7 +11,7 @@ static std::stringstream m_stream;
 struct Printer
 {
 
-    std::string str() const 
+    std::string str() const
     {
         std::string s = std::move(m_stream.str());
         m_stream.str("");
@@ -75,17 +74,17 @@ struct Printer
     Printer& format(const std::tuple<Args...> tup)
     {
         m_stream << "( ";
-        if (sizeof...(Args) > 0) {
-            std::apply([this](auto &... x)
-                        {
-                            (...,static_cast<void>(this->format(x), m_stream << ", "));
-                        }, 
-                        tup);
-        }
-        size_t size = m_stream.str().size();
-        std::string tmp = m_stream.str().substr(0, size - 2) + " )";
-        m_stream.str("");
-        m_stream << tmp;
+        std::apply
+        (
+            [this](auto &... x)
+            {
+                size_t n{0};
+                (...,static_cast<void>
+                            (this->format(x), m_stream << (++n != sizeof...(Args) ? ", " : "")));
+            }, 
+            tup
+        );
+        m_stream << " )";
         return *this;
     }
 };
@@ -124,6 +123,9 @@ int main()
     std::cout << s3 << std::endl;
     std::cout << std::endl;
     std::cout << format(t3) << std::endl;
+    std::tuple<int> t12;
+    std::string s4 = Printer().format(t12).str();
+    std::cout << s4 << std::endl;
     return 0;
 }
 
