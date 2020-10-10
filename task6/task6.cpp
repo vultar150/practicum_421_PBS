@@ -17,10 +17,10 @@ public:
 
 
 template<typename T>
-class MyAlloc {
+class MyAllocStrategy {
 public:
-    MyAlloc() {}
-    ~MyAlloc() {}
+    MyAllocStrategy() {}
+    ~MyAllocStrategy() {}
 
     void* allocate(std::size_t n) { tmp = new T; return tmp; }
 
@@ -36,9 +36,9 @@ struct MyAllocator {
 
     using Traits = std::allocator_traits<MyAllocator<T, E>>;
 
-    MyAllocator() : my_alloc(new MyAlloc<E>()) {}
+    MyAllocator() : my_alloc(new MyAllocStrategy<E>()) {}
 
-    MyAllocator(MyAlloc<E>& my_alloc) : my_alloc(&my_alloc) {}
+    MyAllocator(MyAllocStrategy<E>& my_alloc) : my_alloc(&my_alloc) {}
 
     template<class U, class M = U> 
     MyAllocator(const MyAllocator<U, M>& other) : my_alloc(other.my_alloc) {}
@@ -47,7 +47,7 @@ struct MyAllocator {
 
     void deallocate(T* p, std::size_t n) { my_alloc->deallocate(p, n); }
 
-    MyAlloc<E>* my_alloc;
+    MyAllocStrategy<E>* my_alloc;
 };
 
 
