@@ -22,11 +22,9 @@ public:
     MyAllocStrategy() {}
     ~MyAllocStrategy() {}
 
-    void* allocate(std::size_t n) { tmp = new T; return tmp; }
+    void* allocate(std::size_t n) { return new T; }
 
-    void deallocate(void* p, std::size_t n) { delete tmp; }
-private:
-    T* tmp;
+    void deallocate(T* p, std::size_t n) { delete p; }
 };
 
 
@@ -43,9 +41,13 @@ struct MyAllocator {
     template<class U, class M = U> 
     MyAllocator(const MyAllocator<U, M>& other) : my_alloc(other.my_alloc) {}
 
-    T* allocate(std::size_t n) { return (T*)my_alloc->allocate(n); }
+    T* allocate(std::size_t n) { 
+        return reinterpret_cast<T*>(my_alloc->allocate(n * sizeof(T)));
+    }
 
-    void deallocate(T* p, std::size_t n) { my_alloc->deallocate(p, n); }
+    void deallocate(T* p, std::size_t n) { 
+        my_alloc->deallocate(reinterpret_cast<E*>(p), n);
+    }
 
     MyAllocStrategy<E>* my_alloc;
 };
