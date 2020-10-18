@@ -31,11 +31,11 @@ struct MyAllocator {
     MyAllocator(const MyAllocator<U, M>& other) {}
 
     T* allocate(std::size_t n) {
-        return reinterpret_cast<T*>(new E);
+        return reinterpret_cast<T*>(E:: operator new(n * sizeof(T)));
     }
 
     void deallocate(T* p, std::size_t n) {
-        delete reinterpret_cast<E*>(p);
+        E::operator delete (reinterpret_cast<E*>(p), n * sizeof(T));
     }
 };
 
